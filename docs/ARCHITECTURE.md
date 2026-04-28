@@ -167,13 +167,18 @@ def shanebrain_distill_session(
   "hooks": {
     "SessionStart": [
       {
-        "command": "bash .claude/hooks/session-start.sh",
-        "outputStyle": "additionalContext"
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "bash .claude/hooks/session-start.sh" }
+        ]
       }
     ],
     "Stop": [
       {
-        "command": "bash .claude/hooks/session-end.sh"
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "bash .claude/hooks/session-end.sh" }
+        ]
       }
     ]
   }

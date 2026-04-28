@@ -1,17 +1,25 @@
 {
-  "_comment": "Phase 1 continuity hooks. Both hooks fail gracefully if MCP tools aren't built yet — see docs/PHASE-1-RUNBOOK.md. Hook schema may need adjustment to match the Claude Code version on the Pi; verify with `claude --version` and current docs before relying on it.",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "*",
-        "command": "bash .claude/hooks/session-start.sh",
-        "outputStyle": "additionalContext"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-start.sh"
+          }
+        ]
       }
     ],
     "Stop": [
       {
-        "matcher": "*",
-        "command": "bash .claude/hooks/session-end.sh"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/session-end.sh"
+          }
+        ]
       }
     ]
   }

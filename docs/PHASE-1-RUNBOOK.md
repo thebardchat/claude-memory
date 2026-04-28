@@ -285,7 +285,7 @@ When the session opens, the SessionStart hook fires and the digest is injected a
 
 > "What did you read at session start? Quote the SessionContext header."
 
-**Expect:** Claude quotes the `# SessionContext — surface=claude_code` block. If it can't, the hook didn't fire — check `claude --version` against current Claude Code hook docs and adjust `.claude/settings.json` schema accordingly.
+**Expect:** Claude quotes the `# SessionContext — surface=claude_code` block. If it can't, the hook didn't fire — verify `cat .claude/settings.json` matches the `{matcher, hooks: [{type, command}]}` schema. Different Claude Code versions accept different shapes.
 
 Do a small piece of work in that session. End the session with `/quit` or Ctrl-D. The Stop hook fires; SessionContext is upserted.
 
@@ -328,7 +328,7 @@ Phase 1 is done. The Pi-Termius surface is the first to never start cold.
 | MCP tool 404 | `curl http://localhost:8100/tools` to list registered tools |
 | Weaviate client errors | `docker exec shanebrain-mcp pip show weaviate-client` — port v3 → v4 if needed |
 | `host.docker.internal` not resolving | Use `172.17.0.1` per the Pi rule in `.claude/projects/-home-shanebrain/CLAUDE.md` |
-| SessionStart hook fires but Claude doesn't see context | Verify `outputStyle: additionalContext` field name against current Claude Code docs |
+| SessionStart hook fires but Claude doesn't see context | SessionStart stdout is injected as additional context automatically. If not appearing, check that the hook is actually firing (`bash -x .claude/hooks/session-start.sh`) and that stdout is non-empty |
 
 ## What this runbook does NOT do
 

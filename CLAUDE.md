@@ -100,7 +100,6 @@ Confirm against current Anthropic docs first:
 - Claude.ai MCP connector token storage on web vs. mobile.
 - Claude.ai Memory feature interaction with injected `SessionContext`.
 - Tailscale Funnel vs. Angel Cloud Gateway as the public path — pick one.
-- Claude Code hook schema (`.claude/settings.json`) for the running version on the Pi.
 
 ## When in doubt
 
