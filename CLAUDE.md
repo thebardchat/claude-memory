@@ -4,18 +4,68 @@ Scope: this repository only. Defers to `~/.claude/CLAUDE.md` for identity, value
 
 > Why two files? See [`docs/CLAUDE-md-precedence.md`](docs/CLAUDE-md-precedence.md). The short rule: **global owns WHO/WHY. Repo owns WHAT/HOW. Repo can add, never relax.**
 
+---
+
+## If you are a Claude session reading this for the first time — START HERE
+
+You are most likely running on `shanebrain` (Pi 5), reached over Tailscale from Termius. Before doing anything else:
+
+### 1. Confirm where you are
+
+```bash
+hostname                                                      # expect: shanebrain
+docker ps --filter name=shanebrain --format '{{.Names}}\t{{.Status}}'
+curl -fsS http://localhost:8080/v1/.well-known/ready && echo "Weaviate OK"
+curl -fsS http://localhost:8100/ >/dev/null && echo "MCP OK"
+```
+
+### 2. Read these files in this order
+
+1. `docs/ARCHITECTURE.md` — the design (SessionContext schema, read/write paths, integration table, phased rollout). **Read before proposing alternatives.**
+2. `docs/PHASE-1-RUNBOOK.md` — the active task. Numbered, paste-ready commands. **This is what you execute.**
+3. `docs/CLAUDE-md-precedence.md` — only if asked about CLAUDE.md scope or conflicts.
+4. `.claude/projects/-home-shanebrain/CLAUDE.md` — **inherited environment snapshot (v3.4, 2026-04-03)**. The authoritative reference for ports, services, container names, cluster nodes, MEGA Crew, the `172.17.0.1` Docker-to-host rule, and Shane's working style. Read for context; do not modify.
+
+### 3. What you are working on
+
+**Phase 1 — Claude Code SessionStart/Stop hooks + `SessionContext` Weaviate class.** Active. Branch `claude/multi-agent-memory-architecture-1cx6b`.
+
+**The single next decision** is the gating step in [`docs/PHASE-1-RUNBOOK.md`](docs/PHASE-1-RUNBOOK.md) Step 2: `docker exec shanebrain-mcp grep -nA 40 'def context_snapshot' /app/server.py`. Do that first. The result branches the rest of Phase 1.
+
+### 4. The hooks in this repo are already wired
+
+- `.claude/settings.json` registers SessionStart and Stop hooks.
+- `.claude/hooks/session-start.sh` calls MCP `shanebrain_session_start_context`, falls back to existing `context_snapshot`, prints an HTML comment if both fail.
+- `.claude/hooks/session-end.sh` calls MCP `shanebrain_distill_session`, no-op on failure.
+
+Both hooks **never block the session.** They are safe to commit before the MCP tools exist; they will activate the moment the tools are added in Step 4 of the runbook.
+
+---
+
+## Operator context — Termius via Tailscale
+
+- Shane works from his phone via Termius SSH into `shanebrain` (Pi 5) over Tailscale.
+- Commands must be paste-friendly on a small screen — short, single-block, no long heredocs unless unavoidable.
+- Each runbook step is independently re-runnable; if SSH drops mid-step, re-run that step, do not start over.
+- Local services on the Pi reach each other via `localhost`. Cross-mesh calls use Tailscale hostnames (`shanebrain`, `ultra`, `pulsar`, `bullfrog`, etc.) — never raw IPs in committed configs.
+- Docker containers on the Pi reaching Pi host services use `172.17.0.1` (not `localhost`, not `host.docker.internal`). See `.claude/projects/-home-shanebrain/CLAUDE.md` for the canonical rule.
+
+---
+
 ## What this repo is
 
-The continuity layer for ShaneBrain — design, docs, and the public landing page for the single source-of-truth memory primitive (`SessionContext`) that every Claude surface and external model reads at session start and writes at session end.
+The continuity layer for ShaneBrain — design, docs, working hooks, and the public landing page for the single source-of-truth memory primitive (`SessionContext`) that every Claude surface and external model reads at session start and writes at session end.
 
 - Public landing page: https://thebardchat.github.io/claude-memory/
 - Canonical design: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- Active runbook: [`docs/PHASE-1-RUNBOOK.md`](docs/PHASE-1-RUNBOOK.md)
 - Precedence rules: [`docs/CLAUDE-md-precedence.md`](docs/CLAUDE-md-precedence.md)
 - Global file template: [`docs/global-CLAUDE.md.template.md`](docs/global-CLAUDE.md.template.md)
+- Inherited environment snapshot: [`.claude/projects/-home-shanebrain/CLAUDE.md`](.claude/projects/-home-shanebrain/CLAUDE.md)
 
 ## What this repo is NOT
 
-- Not the source for `shanebrain-mcp` (lives on `shanebrain` Pi).
+- Not the source for `shanebrain-mcp` (lives on `shanebrain` Pi, edited per runbook Step 4).
 - Not the source for the Weaviate schema (defined inside `shanebrain-mcp`).
 - Not a backup of memory contents (Weaviate snapshots go elsewhere).
 - Not a duplicate of identity, values, or red lines from global. Reference, don't restate.
@@ -31,11 +81,9 @@ The continuity layer for ShaneBrain — design, docs, and the public landing pag
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1 | Claude Code SessionStart/Stop hooks + `SessionContext` class | **Active** |
+| 1 | Claude Code SessionStart/Stop hooks + `SessionContext` class | **Active — runbook ready** |
 | 2 | Angel Cloud Gateway public `/mcp/*` route + Claude.ai Project template + Agent SDK helper | Pending |
 | 3 | `ultra` migration, multi-tenant for TheirNameBrain, backup/restore, schema versioning | Pending |
-
-Current phase details live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Conventions specific to this repo
 
@@ -46,23 +94,13 @@ Current phase details live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Verify before writing Phase 2 code
 
-Confirm against current Anthropic docs first (see `docs/ARCHITECTURE.md` "Verify before Phase 2 code" for full list):
+Confirm against current Anthropic docs first:
 
 - Anthropic Projects file size limit.
 - Claude.ai MCP connector token storage on web vs. mobile.
 - Claude.ai Memory feature interaction with injected `SessionContext`.
 - Tailscale Funnel vs. Angel Cloud Gateway as the public path — pick one.
-
-## Single next action (Phase 1 kickoff)
-
-Run on the Pi to verify what `context_snapshot` actually does today — every downstream decision (ratify vs. replace) hinges on this one answer:
-
-```bash
-docker exec shanebrain-mcp \
-  grep -nA 40 'def context_snapshot\|@mcp.tool.*context_snapshot' /app/server.py
-```
-
-If it returns a markdown digest keyed by something stable, ratify it as `shanebrain_session_start_context` and skip building a new tool — go straight to writing `.claude/hooks/session-start.sh`. If it's a thin search wrapper, build the new tool per the Phase 1 signature in `docs/ARCHITECTURE.md` and deprecate `context_snapshot`.
+- Claude Code hook schema (`.claude/settings.json`) for the running version on the Pi.
 
 ## When in doubt
 
