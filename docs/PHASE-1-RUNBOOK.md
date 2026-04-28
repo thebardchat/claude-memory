@@ -4,6 +4,15 @@ Single goal: **a fresh Claude Code session on `shanebrain`, started from Termius
 
 Run order matters. Each step is independently verifiable — if a connection drops mid-step, re-run that step. Steps 6–9 are the only ones that mutate the MCP server; everything before is read-only.
 
+> **Authority note:** You have authority to adapt this runbook when reality differs (library version, transport, file paths). Commit the adaptation in the same change. After every step, `shanebrain_log_conversation` mode=CODE with what you did and what's next. See `CLAUDE.md` "Decision authority" and "Session handoff" sections.
+
+## Verified state (2026-04-28)
+
+- Step 0 preflight ✓ — services healthy, Pi confirmed `shanebrain`.
+- Step 2 verdict ✓ — `shanebrain_context_snapshot` is identity-snapshot, kept; new tools to be added alongside.
+- `weaviate-client` is **v4.21.0**. Use `DockerWeaviateHelper` from `/app/weaviate_bridge.py`. Reach Ollama from the Weaviate container at `http://172.17.0.1:11434` (Pi-host rule).
+- MCP transport is **StreamableHTTP at `/mcp`** — Pi hooks call Weaviate v1 REST directly, not MCP.
+
 ---
 
 ## Step 0 — Operator preflight (Termius, on the Pi)
@@ -68,45 +77,48 @@ echo "context_snapshot verdict: <ratify|replace|missing>" > /tmp/shanebrain/cs-v
 
 ## Step 3 — Define the `SessionContext` class in Weaviate
 
-Goal: one new class. Idempotent — re-running is safe.
+Goal: one new class. Idempotent — re-running is safe. v4 syntax, reuses `DockerWeaviateHelper`.
 
 ```bash
-docker exec shanebrain-mcp python - <<'PY'
-import weaviate
-client = weaviate.Client("http://shanebrain-weaviate:8080")
+docker exec shanebrain-mcp python3 - <<'PY'
+import sys
+sys.path.insert(0, '/app')
+from weaviate_bridge import DockerWeaviateHelper
+from weaviate.classes.config import Configure, Property, DataType
 
-if client.schema.exists("SessionContext"):
-    print("SessionContext exists — leaving alone")
-else:
-    client.schema.create_class({
-        "class": "SessionContext",
-        "vectorizer": "text2vec-ollama",
-        "moduleConfig": {
-            "text2vec-ollama": {
-                "apiEndpoint": "http://host.docker.internal:11434",
-                "model": "nomic-embed-text"
-            }
-        },
-        "properties": [
-            {"name": "session_id",         "dataType": ["text"]},
-            {"name": "surface",            "dataType": ["text"]},
-            {"name": "started_at",         "dataType": ["date"]},
-            {"name": "ended_at",           "dataType": ["date"]},
-            {"name": "summary",            "dataType": ["text"]},
-            {"name": "open_decisions",     "dataType": ["text[]"]},
-            {"name": "in_flight",          "dataType": ["text[]"]},
-            {"name": "last_touched_paths", "dataType": ["text[]"]},
-            {"name": "tenant",             "dataType": ["text"]},
-            {"name": "schema_version",     "dataType": ["int"]},
-        ],
-    })
-    print("Created SessionContext")
+with DockerWeaviateHelper() as h:
+    if h.client.collections.exists("SessionContext"):
+        print("SessionContext exists — leaving alone")
+    else:
+        h.client.collections.create(
+            name="SessionContext",
+            vectorizer_config=Configure.Vectorizer.text2vec_ollama(
+                api_endpoint="http://172.17.0.1:11434",
+                model="nomic-embed-text",
+            ),
+            properties=[
+                Property(name="session_id",         data_type=DataType.TEXT),
+                Property(name="surface",            data_type=DataType.TEXT),
+                Property(name="started_at",         data_type=DataType.DATE),
+                Property(name="ended_at",           data_type=DataType.DATE),
+                Property(name="summary",            data_type=DataType.TEXT),
+                Property(name="open_decisions",     data_type=DataType.TEXT_ARRAY),
+                Property(name="in_flight",          data_type=DataType.TEXT_ARRAY),
+                Property(name="last_touched_paths", data_type=DataType.TEXT_ARRAY),
+                Property(name="tenant",             data_type=DataType.TEXT),
+                Property(name="schema_version",     data_type=DataType.INT),
+            ],
+        )
+        print("Created SessionContext")
 PY
 ```
 
 **Expect:** `Created SessionContext` (first run) or `SessionContext exists — leaving alone` (subsequent runs).
 
-**Note:** Weaviate-in-Docker reaches host Ollama via `host.docker.internal` (added to the container's hosts); if your container can't, see `.claude/projects/-home-shanebrain/CLAUDE.md` rule about `172.17.0.1` and adjust the `apiEndpoint`.
+**Why these choices:**
+- `DockerWeaviateHelper` — reuses existing connection wiring (no new client code).
+- `172.17.0.1:11434` — Weaviate runs on `shanebrain-network` bridge, so it reaches host Ollama via the Docker bridge gateway IP per the Pi rule.
+- `collections.exists()` first — idempotent.
 
 ---
 

@@ -6,6 +6,42 @@ Scope: this repository only. Defers to `~/.claude/CLAUDE.md` for identity, value
 
 ---
 
+## Decision authority — when to act, when to ask
+
+You (any Claude session in this repo) have authority to **DECIDE AND EXECUTE** without consulting Shane on:
+
+- Library version adaptations (e.g., `weaviate-client` v3 → v4 syntax — the running version wins).
+- Transport mechanism choices when multiple work (e.g., direct Weaviate REST vs MCP for the local Pi hooks).
+- File path adjustments (where things actually live in the running environment vs. what the runbook assumed).
+- Idempotency, dedup, and retry strategies.
+- **Adapting the runbook itself when reality differs** — commit the runbook update in the same change.
+
+**CONSULT Shane** before acting on:
+
+- Schema changes (adding/removing classes or properties).
+- Anything that touches MEGA Crew bots or the Arc gatekeeper.
+- Pushes to `master` (always — branch policy).
+- Anything that conflicts with a global `CLAUDE.md` red line.
+- Anything that risks data loss or that takes a service offline for more than a brief restart.
+
+Default to **acting + committing** rather than asking. Round-trip-through-Shane is the failure mode this repo exists to fix. Shane is on a phone over SSH; every prompt costs him time he does not have.
+
+---
+
+## Session handoff via existing MCP tools (until SessionContext lands)
+
+Until the new `SessionContext` class is built and the hooks call it, use the existing 42 MCP tools to thread continuity across sessions. **Do this every session, every meaningful step.**
+
+- **At session start:** `shanebrain_search_conversations` for "Phase 1" or whatever's active. Read what the prior session left behind.
+- **After each meaningful step (3, 4, 5, …):** `shanebrain_log_conversation` mode=`CODE` with: what was done, what was decided, what's next, what's blocked. One short paragraph.
+- **For decisions worth keeping across phases:** `shanebrain_add_knowledge` with category=`phase1-continuity`.
+
+This is the eat-our-own-dog-food protocol. The architect session (claude.ai/web) reads the repo via commits. Pi Claude reads MCP via these calls. **Both stay in sync without Shane acting as relay.**
+
+Once `SessionContext` and the new hooks land at end of Phase 1, this manual protocol is replaced by the automatic SessionStart/Stop flow.
+
+---
+
 ## If you are a Claude session reading this for the first time — START HERE
 
 You are most likely running on `shanebrain` (Pi 5), reached over Tailscale from Termius. Before doing anything else:
@@ -30,7 +66,13 @@ curl -fsS http://localhost:8100/ >/dev/null && echo "MCP OK"
 
 **Phase 1 — Claude Code SessionStart/Stop hooks + `SessionContext` Weaviate class.** Active. Branch `claude/multi-agent-memory-architecture-1cx6b`.
 
-**The single next decision** is the gating step in [`docs/PHASE-1-RUNBOOK.md`](docs/PHASE-1-RUNBOOK.md) Step 2: `docker exec shanebrain-mcp grep -nA 40 'def context_snapshot' /app/server.py`. Do that first. The result branches the rest of Phase 1.
+**Verified facts (2026-04-28):**
+- Pi services healthy: `shanebrain-mcp`, `shanebrain-weaviate` (both Up 3+ days).
+- `weaviate-client` is **v4.21.0** in the MCP container — v3 syntax is removed. Reuse `DockerWeaviateHelper` from `/app/weaviate_bridge.py`.
+- MCP transport is **StreamableHTTP at `/mcp`** (JSON-RPC envelopes), not plain REST `/tools/<name>`. Local Pi hooks should call Weaviate v1 REST directly; the MCP tools are for non-Pi surfaces (Phase 2).
+- `shanebrain_context_snapshot` (server.py:1471) exists but is the **identity** snapshot (sobriety, profile, family). **Keep it.** Our new tools (`shanebrain_session_start_context`, `shanebrain_distill_session`) coexist alongside it.
+
+**Active step:** `docs/PHASE-1-RUNBOOK.md` Step 3 (define `SessionContext` collection in v4 syntax) → Step 4 (add the two new MCP tools).
 
 ### 4. The hooks in this repo are already wired
 
