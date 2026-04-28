@@ -106,11 +106,14 @@ If a UI is built later, build it as a **vault management** UI (rotate tokens, vi
 ## Resource budget
 
 - **Phase 1 + 2 deltas:** one Weaviate class (~MB at current scale), two MCP tool methods (~no RAM delta), two hook scripts (run for milliseconds), one Gateway route (~no RAM delta), one n8n workflow (idle until 03:00). **Pi 5 fits.**
-- **Phase 3 — Ultra migration is the only resource-driven move:**
-  - Move to `ultra`: Weaviate primary, plus the n8n cron-distill workflow (heavy reads at 03:00).
-  - Keep on `shanebrain` (Pi): MCP server (low RAM, latency-sensitive to local Ollama), all 17 MEGA bots, Redis, claudemd-sync.
-  - Pi becomes a read-replica via Weaviate async snapshots every 6h, plus a Redis hot-cache for SessionContext rows.
-  - **Sequence so Pi never goes dark:** stand up Weaviate on `ultra`; dual-write for 7 days; validate query parity; flip MCP's primary URL to `ultra`; demote Pi to replica.
+- **Phase 3 — neworleans + gulfshores migration (ultra is offline, replaced):**
+  - `ultra` never came up. Replaced by two Surface Pro laptops on Tailscale:
+    - **`neworleans`** (active): heavy workloads — Weaviate primary, n8n cron-distill.
+    - **`gulfshores`** (coming online 2026-04-28): Pi offload — candidates are Open WebUI, agent services, or MEGA Crew bots. Role finalized once online.
+  - Keep on `shanebrain` (Pi): MCP server (latency-sensitive to local Ollama), Ollama, Redis, claudemd-sync, Angel Cloud Gateway.
+  - Pi becomes a Weaviate read-replica via async snapshots every 6h, plus Redis hot-cache for SessionContext rows.
+  - **Sequence so Pi never goes dark:** stand up Weaviate on `neworleans`; dual-write for 7 days; validate query parity; flip MCP's primary URL to `neworleans`; demote Pi to replica.
+  - **gulfshores offload decision:** once online, inventory Pi RAM/CPU headroom and pick the heaviest portable service (likely Open WebUI at port 8080). Move one service at a time.
 
 ## Extend vs. build
 
@@ -208,9 +211,10 @@ curl -fsS --max-time 3 \
 
 ### Phase 3 — Harden
 
-- Ultra migration per resource-budget sequence above.
+- **neworleans migration** (replaces Ultra): Weaviate primary + n8n to `neworleans`. Dual-write 7 days, then Pi demoted to replica.
+- **gulfshores offload** (TBD once online): inventory Pi services, move heaviest portable one first. Open WebUI (port 8080) is the likely first candidate.
 - `tenant` property on `SessionContext` already in v1 schema → flip to multi-tenant when TheirNameBrain ships, no migration.
-- Backup/restore: Weaviate snapshot to local + off-Pi (Ultra → encrypted backup to Angel Cloud).
+- Backup/restore: Weaviate snapshot to local + off-Pi (`neworleans` → encrypted backup to Angel Cloud).
 - Schema versioning: `schema_version` field already in v1; bump-on-migration script.
 
 ## Verify before Phase 2 code
