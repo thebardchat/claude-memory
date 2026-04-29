@@ -6,16 +6,28 @@
 # v1 REST directly. The MCP tools (shanebrain_session_start_context) still
 # exist for Phase 2 surfaces (claude.ai, API) that reach them via Gateway.
 #
+# MULTI-NODE: this hook works from any Tailscale-bound node. The default
+# WEAVIATE URL resolves to localhost on `shanebrain` (Pi) and to the Tailscale
+# hostname `shanebrain` from any other node (neworleans, gulfshores, jaxton…).
+# Each node gets its own continuity thread via surface = "claude_code:<host>".
+#
 # NON-BLOCKING: any failure emits an HTML comment and exits 0.
 # Env overrides:
-#   SHANEBRAIN_WEAVIATE_URL  default: http://localhost:8080
+#   SHANEBRAIN_WEAVIATE_URL  default: localhost on shanebrain, http://shanebrain:8080 elsewhere
 #   CLAUDE_SESSION_ID        default: uuidgen / nanosecond timestamp
 
 set -u
 
+NODE="$(hostname 2>/dev/null || echo unknown)"
 SESSION_ID="${CLAUDE_SESSION_ID:-$(uuidgen 2>/dev/null || date +%s%N)}"
-SURFACE="claude_code"
-WEAVIATE="${SHANEBRAIN_WEAVIATE_URL:-http://localhost:8080}"
+SURFACE="claude_code:${NODE}"
+
+if [ "$NODE" = "shanebrain" ]; then
+  WEAVIATE_DEFAULT="http://localhost:8080"
+else
+  WEAVIATE_DEFAULT="http://shanebrain:8080"
+fi
+WEAVIATE="${SHANEBRAIN_WEAVIATE_URL:-$WEAVIATE_DEFAULT}"
 
 mkdir -p /tmp/shanebrain 2>/dev/null || true
 echo "$SESSION_ID" > /tmp/shanebrain/claude-session-id 2>/dev/null || true
@@ -36,7 +48,7 @@ fi
 echo "$RESP" > /tmp/shanebrain/sc_resp.json 2>/dev/null || true
 
 # Format to markdown
-python3 - "$SESSION_ID" <<'PY'
+python3 - "$SESSION_ID" "$SURFACE" <<'PY'
 import sys, json
 
 try:
@@ -48,7 +60,8 @@ except Exception as e:
     sys.exit(0)
 
 rows = (data.get("data") or {}).get("Get", {}).get("SessionContext") or []
-lines = ["# SessionContext — surface=claude_code", ""]
+surface = sys.argv[2] if len(sys.argv) > 2 else "claude_code"
+lines = [f"# SessionContext — surface={surface}", ""]
 
 if rows:
     r = rows[0]

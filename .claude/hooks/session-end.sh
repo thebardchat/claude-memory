@@ -7,6 +7,11 @@
 # stopping. This hook is a safety net: it upserts a stub so the next session
 # always has an ended_at marker even if distillation wasn't called.
 #
+# MULTI-NODE: works from any Tailscale-bound node. WEAVIATE default resolves to
+# localhost on shanebrain (Pi), Tailscale hostname `shanebrain` everywhere else.
+# Surface is per-node (`claude_code:<hostname>`) so each machine threads its own
+# continuity instead of overwriting a shared one.
+#
 # Upsert logic: if a SessionContext already exists for this session_id
 # (written by shanebrain_distill_session during the session), PATCH ended_at
 # only. If not, create a minimal stub.
@@ -15,9 +20,16 @@
 
 set -u
 
+NODE="$(hostname 2>/dev/null || echo unknown)"
 SESSION_ID="$(cat /tmp/shanebrain/claude-session-id 2>/dev/null || echo "unknown-$(date +%s)")"
-SURFACE="claude_code"
-WEAVIATE="${SHANEBRAIN_WEAVIATE_URL:-http://localhost:8080}"
+SURFACE="claude_code:${NODE}"
+
+if [ "$NODE" = "shanebrain" ]; then
+  WEAVIATE_DEFAULT="http://localhost:8080"
+else
+  WEAVIATE_DEFAULT="http://shanebrain:8080"
+fi
+WEAVIATE="${SHANEBRAIN_WEAVIATE_URL:-$WEAVIATE_DEFAULT}"
 NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 python3 - "$SESSION_ID" "$SURFACE" "$WEAVIATE" "$NOW" <<'PY'
