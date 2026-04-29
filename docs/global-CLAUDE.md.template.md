@@ -17,6 +17,17 @@ The content below the `---` is the recommended global file body. Copy from there
 
 Scope: every Claude session. Repo CLAUDE.md files may extend but not override what's below.
 
+## Source of truth — claude-memory repo (read this first)
+
+The architecture for ShaneBrain — design, runbooks, hooks, mesh manifest, precedence rules — lives at:
+
+- **GitHub:** https://github.com/thebardchat/claude-memory
+- **Local clone (every node):** `~/claude-memory`
+
+Every Claude session on every node defers to that repo for project architecture. This global file owns **identity**. The repo owns **project**. If the repo doesn't exist locally, clone it (`git clone https://github.com/thebardchat/claude-memory.git ~/claude-memory`). Then read `~/claude-memory/CLAUDE.md` — it tells you the active phase, the branch, and what's in flight.
+
+To set up a fresh node: see `~/claude-memory/docs/NODE-BOOTSTRAP.md`.
+
 ## Identity
 
 - User: Shane. Builder of ShaneBrain.
