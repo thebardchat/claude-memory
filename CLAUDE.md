@@ -107,6 +107,7 @@ The continuity layer for ShaneBrain — design, docs, working hooks, and the pub
 - Mesh manifest: [`docs/MESH.md`](docs/MESH.md)
 - MEGA Crew product line: [`docs/MEGA-CREW.md`](docs/MEGA-CREW.md)
 - Per-node bootstrap: [`docs/NODE-BOOTSTRAP.md`](docs/NODE-BOOTSTRAP.md)
+- Backup-and-wipe (Windows → Linux): [`docs/BACKUP-AND-WIPE.md`](docs/BACKUP-AND-WIPE.md)
 - Precedence rules: [`docs/CLAUDE-md-precedence.md`](docs/CLAUDE-md-precedence.md)
 - Global file template: [`docs/global-CLAUDE.md.template.md`](docs/global-CLAUDE.md.template.md)
 - Inherited environment snapshot: [`.claude/projects/-home-shanebrain/CLAUDE.md`](.claude/projects/-home-shanebrain/CLAUDE.md)
