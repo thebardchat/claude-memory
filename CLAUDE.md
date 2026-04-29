@@ -58,11 +58,12 @@ curl -fsS http://localhost:8100/ >/dev/null && echo "MCP OK"
 ### 2. Read these files in this order
 
 1. `docs/MESH.md` — which Shane node you're probably on, what role it plays, what services it runs.
-2. `docs/ARCHITECTURE.md` — the design (SessionContext schema, read/write paths, integration table, phased rollout). **Read before proposing alternatives.**
-3. `docs/PHASE-1-RUNBOOK.md` — the active task. Numbered, paste-ready commands. **This is what you execute.**
-4. `docs/NODE-BOOTSTRAP.md` — only if you're being set up on a new node, or if the user asks how a node should reach this repo.
-5. `docs/CLAUDE-md-precedence.md` — only if asked about CLAUDE.md scope or conflicts.
-6. `.claude/projects/-home-shanebrain/CLAUDE.md` — **inherited environment snapshot, dated 2026-04-03 (v3.4)**. Useful for stable facts: the `172.17.0.1` Docker-to-host rule, MEGA Crew zones, cluster topology, Shane's working style. **Treat the per-port service list as historical, not current** — services come and go (e.g., open-webui was removed). For the current running state, run `docker ps` and `systemctl list-units --type=service --state=running` on the Pi. Read for context; do not modify this file.
+2. `docs/MEGA-CREW.md` — **MEGA Crew is a separate product line**, not infrastructure. 16 bots, evolution loop via Gemini, Arc gatekeeping, daily noir comic published to GitHub + Cloudflare. Read this before recommending the removal of anything Ollama- or Pi-related.
+3. `docs/ARCHITECTURE.md` — the design (SessionContext schema, read/write paths, integration table, phased rollout). **Read before proposing alternatives.**
+4. `docs/PHASE-1-RUNBOOK.md` — the active task. Numbered, paste-ready commands. **This is what you execute.**
+5. `docs/NODE-BOOTSTRAP.md` — only if you're being set up on a new node, or if the user asks how a node should reach this repo.
+6. `docs/CLAUDE-md-precedence.md` — only if asked about CLAUDE.md scope or conflicts.
+7. `.claude/projects/-home-shanebrain/CLAUDE.md` — **inherited environment snapshot, dated 2026-04-03 (v3.4)**. Useful for stable facts: the `172.17.0.1` Docker-to-host rule, MEGA Crew zones, cluster topology, Shane's working style. **Treat the per-port service list as historical, not current** — services come and go (e.g., open-webui was removed). For the current running state, run `docker ps` and `systemctl list-units --type=service --state=running` on the Pi. Read for context; do not modify this file.
 
 ### 3. What you are working on
 
@@ -104,6 +105,7 @@ The continuity layer for ShaneBrain — design, docs, working hooks, and the pub
 - Canonical design: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - Active runbook: [`docs/PHASE-1-RUNBOOK.md`](docs/PHASE-1-RUNBOOK.md)
 - Mesh manifest: [`docs/MESH.md`](docs/MESH.md)
+- MEGA Crew product line: [`docs/MEGA-CREW.md`](docs/MEGA-CREW.md)
 - Per-node bootstrap: [`docs/NODE-BOOTSTRAP.md`](docs/NODE-BOOTSTRAP.md)
 - Precedence rules: [`docs/CLAUDE-md-precedence.md`](docs/CLAUDE-md-precedence.md)
 - Global file template: [`docs/global-CLAUDE.md.template.md`](docs/global-CLAUDE.md.template.md)
