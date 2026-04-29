@@ -70,8 +70,13 @@ client_secret>                                      <-- leave blank, press Enter
 scope> 1                                            <-- "Full access all files"
 service_account_file>                               <-- leave blank, press Enter
 Edit advanced config? n
-Use auto config? n                                  <-- IMPORTANT: say no on headless
-                                                    <-- you'll get a URL to paste into a browser
+Use auto config? n                                  <-- IMPORTANT: say N (not Y)
+                                                    <-- rclone will hint "If not sure try Y" — IGNORE
+                                                    <-- Y opens http://127.0.0.1:53682/ which only
+                                                    <-- works if your browser is ON this machine.
+                                                    <-- You're SSH'd from your phone, so 127.0.0.1
+                                                    <-- on this Windows box is unreachable from
+                                                    <-- your phone. N gives a paste-able URL.
 ```
 
 When it shows the auth URL:
