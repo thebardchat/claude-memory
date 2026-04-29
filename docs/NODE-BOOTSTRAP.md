@@ -6,6 +6,8 @@ How to set up any of Shane's nodes so its Claude Code sessions automatically kno
 
 ## Step 1 — Clone the repo to a known path
 
+### Linux / macOS / Git-Bash on Windows
+
 Paste:
 
 ```bash
@@ -16,7 +18,25 @@ ls ~/claude-memory/CLAUDE.md && echo "Repo present at ~/claude-memory"
 
 The `||` branch makes it safe to re-run — clones if missing, pulls if already present.
 
+### Windows native cmd.exe (bullfrog, pulsar, jaxton)
+
+`cmd.exe` doesn't expand `~`. Use `%USERPROFILE%`:
+
+```cmd
+cd /d %USERPROFILE%
+git clone https://github.com/thebardchat/claude-memory.git claude-memory
+cd claude-memory
+git pull
+dir CLAUDE.md
+```
+
+If the repo is already cloned, the `git clone` will print "destination path already exists" — ignore it; the `git pull` on the next line gets the latest.
+
+> **Note for Windows operators:** Shane prefers `cmd.exe` over PowerShell on Windows nodes (per `.claude/projects/-home-shanebrain/CLAUDE.md`). Inside a Claude Code session, the Bash tool runs git-bash and understands `~` — so bash blocks pasted INTO Claude work. The `cmd.exe` syntax above is for the OS shell outside Claude.
+
 ## Step 2 — Suggest a global `~/.claude/CLAUDE.md` (does not overwrite)
+
+### Linux / macOS / Git-Bash
 
 Paste:
 
@@ -36,10 +56,31 @@ fi
 
 This **never** overwrites your real global file. It either suggests one (if missing) or drops the latest template alongside for manual diff/merge.
 
+### Windows native cmd.exe
+
+```cmd
+if not exist %USERPROFILE%\.claude mkdir %USERPROFILE%\.claude
+if not exist %USERPROFILE%\.claude\CLAUDE.md (
+  copy /Y %USERPROFILE%\claude-memory\docs\global-CLAUDE.md.template.md %USERPROFILE%\.claude\CLAUDE.md.suggested
+  echo Suggested template at %%USERPROFILE%%\.claude\CLAUDE.md.suggested
+  echo Review then: move %%USERPROFILE%%\.claude\CLAUDE.md.suggested %%USERPROFILE%%\.claude\CLAUDE.md
+) else (
+  copy /Y %USERPROFILE%\claude-memory\docs\global-CLAUDE.md.template.md %USERPROFILE%\.claude\CLAUDE.md.template-latest
+  echo Existing global preserved. Latest template at %%USERPROFILE%%\.claude\CLAUDE.md.template-latest
+)
+```
+
 ## Step 3 — Smoke test
 
+### Linux / macOS / Git-Bash
 ```bash
 cd ~/claude-memory && claude
+```
+
+### Windows native cmd.exe
+```cmd
+cd /d %USERPROFILE%\claude-memory
+claude
 ```
 
 When the session opens, ask:

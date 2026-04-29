@@ -101,7 +101,6 @@ If a UI is built later, build it as a **vault management** UI (rotate tokens, vi
 | Ollama bots (MEGA Crew) | `BotMemory` read + `SessionContext WHERE surface = ollama_bot:<name>` | Arc gatekeeper batched write to `SessionContext` on tick boundary | Local | Bot continues with `BotMemory` only (current behavior) | **Y** — extend tick logic, add one query |
 | Gemini Strategist | Existing 4×/day call: prepend `context_snapshot` markdown | Writes findings to `SessionContext` with surface=`gemini_strategist` | Existing creds | Skips this run | **Partial** — bot exists, prompt prepend missing |
 | n8n on Pi | Webhook node → MCP `context_snapshot` | Webhook node → `shanebrain_distill_session` for nightly sweep | Local | Workflow retries, no data loss | **N** — workflow file to author |
-| Open WebUI users | Through whichever bot they hit | Same | Pass-through | Bot graceful degrade | **Y** — no change needed |
 
 ## Resource budget
 
@@ -109,11 +108,11 @@ If a UI is built later, build it as a **vault management** UI (rotate tokens, vi
 - **Phase 3 — neworleans + gulfshores migration (ultra is offline, replaced):**
   - `ultra` never came up. Replaced by two Surface Pro laptops on Tailscale:
     - **`neworleans`** (active): heavy workloads — Weaviate primary, n8n cron-distill.
-    - **`gulfshores`** (coming online 2026-04-28): Pi offload — candidates are Open WebUI, agent services, or MEGA Crew bots. Role finalized once online.
+    - **`gulfshores`** (coming online 2026-04-28): Pi offload — role assigned at bring-up after a live inventory of what's actually running on the Pi today. Candidates: Buddy Claude (8008), Mega Dashboard (8300), ShaneBrain Agents (8400), Voice Dump Pipeline (8200), or selected MEGA Crew bots.
   - Keep on `shanebrain` (Pi): MCP server (latency-sensitive to local Ollama), Ollama, Redis, claudemd-sync, Angel Cloud Gateway.
   - Pi becomes a Weaviate read-replica via async snapshots every 6h, plus Redis hot-cache for SessionContext rows.
   - **Sequence so Pi never goes dark:** stand up Weaviate on `neworleans`; dual-write for 7 days; validate query parity; flip MCP's primary URL to `neworleans`; demote Pi to replica.
-  - **gulfshores offload decision:** once online, inventory Pi RAM/CPU headroom and pick the heaviest portable service (likely Open WebUI at port 8080). Move one service at a time.
+  - **gulfshores offload decision:** once online, inventory the Pi's actual running services (`docker ps`, `systemctl list-units --type=service --state=running`), then pick the heaviest portable one. Move one service at a time.
 
 ## Extend vs. build
 
@@ -212,7 +211,7 @@ curl -fsS --max-time 3 \
 ### Phase 3 — Harden
 
 - **neworleans migration** (replaces Ultra): Weaviate primary + n8n to `neworleans`. Dual-write 7 days, then Pi demoted to replica.
-- **gulfshores offload** (TBD once online): inventory Pi services, move heaviest portable one first. Open WebUI (port 8080) is the likely first candidate.
+- **gulfshores offload** (TBD once online): live inventory of what's currently on the Pi (do not rely on the 2026-04-03 inherited snapshot — it's dated). Pick the heaviest portable service, move one at a time.
 - `tenant` property on `SessionContext` already in v1 schema → flip to multi-tenant when TheirNameBrain ships, no migration.
 - Backup/restore: Weaviate snapshot to local + off-Pi (`neworleans` → encrypted backup to Angel Cloud).
 - Schema versioning: `schema_version` field already in v1; bump-on-migration script.

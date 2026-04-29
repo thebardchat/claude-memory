@@ -8,7 +8,7 @@ The set of nodes that participate in ShaneBrain. **Tailscale hostnames only — 
 |---|---|---|---|
 | `shanebrain` | Orchestrator (Pi 5, 16GB) | `shanebrain-mcp` (8100), `shanebrain-weaviate` (8080), Ollama (11434), MEGA Crew, claudemd-sync, Angel Cloud Gateway (4200), n8n (5678), Redis | Demoted to Weaviate read-replica + Redis hot-cache + MCP/Ollama/Gateway local |
 | `neworleans` | Heavy-lifter (Surface Pro) | (Phase 1: passive — repo only) | Weaviate primary, n8n nightly distill |
-| `gulfshores` | Pi-offload candidate (Surface Pro, coming online 2026-04-28) | (TBD on bring-up) | Final role chosen at bring-up: Open WebUI, agent services, or selected MEGA Crew bots |
+| `gulfshores` | Pi-offload candidate (Surface Pro, coming online 2026-04-28, headless Linux server profile) | (TBD on bring-up) | Final role chosen at bring-up after live inventory of what's currently on the Pi. Candidates: Buddy Claude, Mega Dashboard, ShaneBrain Agents, Voice Dump Pipeline, or selected MEGA Crew bots. |
 | `pulsar` | Cluster node | Ollama (llama3.1:8b — fastest inference) | Same |
 | `bullfrog` | Cluster node | Ollama (codellama) | Same |
 | `jaxton` | Independent laptop | Variable | Same |

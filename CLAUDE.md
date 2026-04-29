@@ -62,7 +62,7 @@ curl -fsS http://localhost:8100/ >/dev/null && echo "MCP OK"
 3. `docs/PHASE-1-RUNBOOK.md` — the active task. Numbered, paste-ready commands. **This is what you execute.**
 4. `docs/NODE-BOOTSTRAP.md` — only if you're being set up on a new node, or if the user asks how a node should reach this repo.
 5. `docs/CLAUDE-md-precedence.md` — only if asked about CLAUDE.md scope or conflicts.
-6. `.claude/projects/-home-shanebrain/CLAUDE.md` — **inherited environment snapshot (v3.4, 2026-04-03)**. The authoritative reference for ports, services, container names, cluster nodes, MEGA Crew, the `172.17.0.1` Docker-to-host rule, and Shane's working style. Read for context; do not modify.
+6. `.claude/projects/-home-shanebrain/CLAUDE.md` — **inherited environment snapshot, dated 2026-04-03 (v3.4)**. Useful for stable facts: the `172.17.0.1` Docker-to-host rule, MEGA Crew zones, cluster topology, Shane's working style. **Treat the per-port service list as historical, not current** — services come and go (e.g., open-webui was removed). For the current running state, run `docker ps` and `systemctl list-units --type=service --state=running` on the Pi. Read for context; do not modify this file.
 
 ### 3. What you are working on
 
