@@ -18,14 +18,22 @@
 
 set -u
 
+# Source canonical service locations. One file, one source of truth.
+INFRA_FILE="$(dirname "$0")/../infra.env"
+[ -f "$INFRA_FILE" ] && . "$INFRA_FILE"
+
 NODE="$(hostname 2>/dev/null || echo unknown)"
 SESSION_ID="${CLAUDE_SESSION_ID:-$(uuidgen 2>/dev/null || date +%s%N)}"
 SURFACE="claude_code:${NODE}"
 
-if [ "$NODE" = "shanebrain" ]; then
-  WEAVIATE_DEFAULT="http://localhost:8080"
+WEAVIATE_HOST="${SHANEBRAIN_WEAVIATE_HOST:-shanebrain}"
+WEAVIATE_PORT="${SHANEBRAIN_WEAVIATE_PORT:-8080}"
+
+# If running ON the Weaviate host, prefer localhost (skip the DNS hop)
+if [ "$NODE" = "$WEAVIATE_HOST" ]; then
+  WEAVIATE_DEFAULT="http://localhost:${WEAVIATE_PORT}"
 else
-  WEAVIATE_DEFAULT="http://shanebrain:8080"
+  WEAVIATE_DEFAULT="http://${WEAVIATE_HOST}:${WEAVIATE_PORT}"
 fi
 WEAVIATE="${SHANEBRAIN_WEAVIATE_URL:-$WEAVIATE_DEFAULT}"
 

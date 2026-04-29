@@ -20,14 +20,21 @@
 
 set -u
 
+# Source canonical service locations. One file, one source of truth.
+INFRA_FILE="$(dirname "$0")/../infra.env"
+[ -f "$INFRA_FILE" ] && . "$INFRA_FILE"
+
 NODE="$(hostname 2>/dev/null || echo unknown)"
 SESSION_ID="$(cat /tmp/shanebrain/claude-session-id 2>/dev/null || echo "unknown-$(date +%s)")"
 SURFACE="claude_code:${NODE}"
 
-if [ "$NODE" = "shanebrain" ]; then
-  WEAVIATE_DEFAULT="http://localhost:8080"
+WEAVIATE_HOST="${SHANEBRAIN_WEAVIATE_HOST:-shanebrain}"
+WEAVIATE_PORT="${SHANEBRAIN_WEAVIATE_PORT:-8080}"
+
+if [ "$NODE" = "$WEAVIATE_HOST" ]; then
+  WEAVIATE_DEFAULT="http://localhost:${WEAVIATE_PORT}"
 else
-  WEAVIATE_DEFAULT="http://shanebrain:8080"
+  WEAVIATE_DEFAULT="http://${WEAVIATE_HOST}:${WEAVIATE_PORT}"
 fi
 WEAVIATE="${SHANEBRAIN_WEAVIATE_URL:-$WEAVIATE_DEFAULT}"
 NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
