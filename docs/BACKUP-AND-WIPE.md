@@ -36,6 +36,16 @@ winget install Rclone.Rclone
 :: Add C:\rclone\ to PATH (System Properties > Environment Variables)
 ```
 
+> **Heads-up: PATH does not refresh in already-open cmd windows.** After `winget install`, your current cmd session won't see `rclone` even though it's installed. Two fixes:
+>
+> - **Open a fresh cmd window** — the new shell picks up the updated user PATH.
+> - **Or patch this session in place:**
+>   ```cmd
+>   set PATH=%PATH%;%LOCALAPPDATA%\Microsoft\WinGet\Links
+>   ```
+>
+> After either, `rclone version` should print a version number.
+
 Verify:
 
 ```cmd
