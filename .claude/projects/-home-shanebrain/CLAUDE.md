@@ -1,7 +1,7 @@
-# CLAUDE.md — ShaneBrain Global Instructions v4.1
+# CLAUDE.md — ShaneBrain Global Instructions v4.2
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Ollama fully purged from entire stack — brains rewired, alerter cleaned, 9 dead scripts deleted, dashboard + MCP + frontend all updated. Nothing running touches Ollama anywhere.
+> Updated: 2026-05-07 | Last session: Agents ecosystem purge — ops health check rewired to claude-haiku, CLUSTER_NODES updated to 7 Tailscale hostnames, AgentLog schema fixed to text2vec-transformers, dead Ollama imports removed from librarian + ops + logger. ollama_loadbalancer.py + angel_cloud_cli.py deleted.
 
 ---
 
@@ -267,10 +267,10 @@ Shane has 44 MCP tools running on his Pi 5 via the `shanebrain` MCP server (29 t
 - Shape Shane's voice dumps, don't reimagine them; stay tight to his words
 
 ## Key Projects Built
-- **TheirNameBrain** — Legacy AI prototype at `angel-cloud/theirnamebrain.py`
+- **TheirNameBrain** — Legacy AI prototype (deleted — `angel-cloud/theirnamebrain.py` removed 2026-05-07)
 - **Drive Agent** — 8TB + Google Drive scanner at `pulsar-ai/drive-agent.py`
 - **Workflow Agent** — Self-building N8N automation at `pulsar-ai/workflow-agent.py`
-- **Messenger Storyteller** — Facebook Messenger bot at `angel-cloud/messenger.py`
+- **Messenger Storyteller** — Facebook Messenger bot (deleted — `angel-cloud/messenger.py` removed 2026-05-07)
 - **AI-Trainer-MAX** — 36-module curriculum for the 800M
 
 ## Automation & CI/CD
@@ -354,13 +354,17 @@ Test-driven pipeline for publish-ready audio:
 - `github-mcp-server` can manage all 16+ thebardchat repos directly via MCP
 - Do NOT use or integrate any leaked Claude Code source — Anthropic is actively DMCAing it (April 2026 incident)
 
-## Agent Ecosystem (Built 2026-04-03)
+## Agent Ecosystem (Built 2026-04-03, purged 2026-05-07)
 - **7 specialist agents** with 50 red line rules at `/mnt/shanebrain-raid/shanebrain-core/agents/`
 - FastAPI gateway on **port 8400**, systemd service `shanebrain-agents`
 - Agents: Guardian (security), Librarian (RAG), Dispatcher (routing), Builder (code), Storyteller (creative), Ops (infra), Social (comms)
 - Orchestrator routes through Dispatcher → Agent → Weaviate AgentLog
 - Claude Agent SDK v0.1.55 installed, `/sdk` endpoint for Claude-orchestrating-Claude mode
 - Red line engine: credential leak prevention, RAID protection, fan safety, force-push blocking, AI disclosure enforcement
+- **Ops agent**: no longer polls Ollama ports — health check returns `inference: "claude-haiku"` (static)
+- **Config**: `DEFAULT_MODEL = "claude-sonnet-4-6"`, `FAST_MODEL = "claude-haiku-4-5-20251001"`, `POWER_MODEL = "claude-opus-4-7"` — `LOCAL_MODEL` and `OLLAMA_URL` removed
+- **CLUSTER_NODES**: 7 Tailscale hostnames — shanebrain, neworleans, ultra, pulsar, bullfrog, mexico, gulfshores (no raw IPs, no jaxton)
+- **AgentLog Weaviate schema**: `text2vec-transformers` (MiniLM-L6-v2, 384-dim) — was incorrectly using `text2vec-ollama`
 
 ## Dashboard Command Center (Overhauled 2026-04-03)
 - Full-width command bar with clock, sobriety, forecast, cluster nodes by name, quick action buttons
