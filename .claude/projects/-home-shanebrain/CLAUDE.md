@@ -367,7 +367,7 @@ Test-driven pipeline for publish-ready audio:
 - Full-page matrix rain background (katakana + hex)
 - **NEURAL MAP tab** — 29-node force-directed graph showing entire ecosystem as living brain with data pulses
 - **BUDDY tab** — full Claude×Gemini dialogue view with seed topic buttons
-- Embedded AI chat widget (bottom-right, talks to Ollama cluster)
+- Embedded AI chat widget (bottom-right, talks to Claude Haiku)
 - **Vortex the Turtle** — mascot pulls random wisdom from Weaviate, 15 original quips
 - Anthropic sparkle channel bug (fixed bottom-left, pulsating orange)
 - 4 tabs: DASHBOARD | NEURAL | BUDDY | PROMOTE
@@ -541,8 +541,7 @@ MEGA model: bot LLM inference DISABLED — Ollama fully deleted 2026-05-07 (bina
 - First successful call: April 9, 2026 — identified arc rejection rate as critical bottleneck, proposed feedback loop fixes
 
 ### Cluster Proxy
-- /mnt/shanebrain-raid/shanebrain-core/scripts/ollama-proxy.py now uses ThreadingMixIn (was single-threaded)
-- Bots bypass proxy entirely — proxy serves non-bot consumers only
+- Fully deleted 2026-05-07 (ollama-proxy.py removed, service unit deleted)
 
 ## Gmail SMTP Email Tools (Added April 10, 2026)
 
