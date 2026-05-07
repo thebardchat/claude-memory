@@ -1,7 +1,7 @@
 # CLAUDE.md — ShaneBrain Global Instructions v4.2
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Agents ecosystem purge — ops health check rewired to claude-haiku, CLUSTER_NODES updated to 7 Tailscale hostnames, AgentLog schema fixed to text2vec-transformers, dead Ollama imports removed from librarian + ops + logger. ollama_loadbalancer.py + angel_cloud_cli.py deleted.
+> Updated: 2026-05-07 | Last session: Agents ecosystem purge pass 2 — dispatcher keyword map, librarian embed instructions, ops service list + health check, shanebrain-agents.service dependency all cleaned. Nothing in agents touches Ollama anywhere.
 
 ---
 
