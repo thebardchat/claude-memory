@@ -1,7 +1,7 @@
-# CLAUDE.md — ShaneBrain Global Instructions v4.0
+# CLAUDE.md — ShaneBrain Global Instructions v4.1
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Ollama fully killed + masked, dashboard chat → Claude Haiku, MCP Docker → host networking, jaxton retired (now mexico), 12.6GB RAM free
+> Updated: 2026-05-07 | Last session: Ollama FULLY DELETED (binary, libs, all systemd units, system user, RAID dir, dead code stripped from MCP server) — all inference now Claude Haiku. MCP tools shanebrain_chat + shanebrain_draft_create + shanebrain_ollama_generate rewired and working. ollama-proxy was still silently running — killed. Preflight 17/0/0, 12.6GB RAM free.
 
 ---
 
@@ -67,7 +67,7 @@ Shane has 44 MCP tools running on his Pi 5 via the `shanebrain` MCP server (29 t
 
 ### Session Start (ALWAYS do these):
 1. `shanebrain_daily_briefing` — Personal daily briefing: sobriety days, weekday verse, Book II word count, Gavin's wedding countdown, cluster health, recent Thoughts. MCP App UI at `ui://shanebrain/briefing`. Pure-Python, no Ollama.
-2. `shanebrain_system_health` — Verify Weaviate, Ollama, Gateway are running
+2. `shanebrain_system_health` — Verify Weaviate, Claude Haiku inference, Gateway are running
 3. `shanebrain_search_conversations` — Check if today's topic was discussed before
 
 ### Session End (ALWAYS do these):
@@ -86,8 +86,9 @@ Shane has 44 MCP tools running on his Pi 5 via the `shanebrain` MCP server (29 t
 - `shanebrain_plan_write` / `plan_read` / `plan_list` — multi-session project planning
 - `shanebrain_search_friends` / `get_top_friends` — people Shane knows
 - `shanebrain_security_log_recent` / `security_log_search` / `privacy_audit_search` — security events
-- `shanebrain_chat` — RAG chat via Weaviate (Ollama removed — may return error until rewired)
-- `shanebrain_ollama_generate` / `ollama_list_models` — **Ollama decommissioned, these will error**
+- `shanebrain_chat` — RAG chat via Weaviate + Claude Haiku generation (fully working)
+- `shanebrain_ollama_generate` — direct generation via Claude Haiku (fully working, Ollama gone)
+- `shanebrain_ollama_list_models` — returns decommission notice (Ollama fully deleted 2026-05-07)
 - `shanebrain_rag_list_classes` / `rag_delete` — Weaviate admin
 - `shanebrain_search_conversations` / `get_conversation_history` / `log_conversation` — session history
 - `shanebrain_daily_note_search` — search journal entries
@@ -132,23 +133,22 @@ Shane has 44 MCP tools running on his Pi 5 via the `shanebrain` MCP server (29 t
 | 8500 | Claim Cruncher API (FastAPI) |
 | 9000 | Portainer (Docker) |
 | 9998 | HaloFinance Ledger (SQLite dashboard, family auth) |
-| 11434 | Ollama — **STOPPED + MASKED 2026-05-07** (fully gone, port clear) |
-| 11435 | Ollama Cluster Proxy — **STOPPED + MASKED 2026-05-07** |
+| 11434 | Ollama — **FULLY DELETED 2026-05-07** (binary gone, no service files, port permanently clear) |
+| 11435 | Ollama Cluster Proxy — **FULLY DELETED 2026-05-07** |
 | 34872 | Rojo (Angel Cloud Roblox project sync) |
 
-### 4-Node Cluster SSH
-| Node | SSH | Priority | Notes |
-|------|-----|----------|-------|
-| Pulsar00100 | `ssh hubby@100.81.70.117` | 1 (fastest) | Has llama3.1:8b |
-| Pi 5 (local) | localhost | 2 (controller) | Runs everything |
-| Bullfrog-R2D2 | `ssh shane@100.87.222.17` | 3 | Has codellama |
-| Jaxton Laptop | no SSH — Ollama only at `100.94.122.125:11434` | 4 | |
-- All Windows nodes: headless, auto-login, Ollama auto-start, lid-close safe, firewalls off
-- Password for all Windows nodes: in Weaviate vault (search "cluster credentials")
+### Cluster Node SSH
+| Node | SSH | Notes |
+|------|-----|-------|
+| Pulsar00100 | `ssh hubby@100.81.70.117` | Windows, Tailscale |
+| Pi 5 (local) | localhost | Controller, runs everything |
+| Bullfrog-R2D2 | `ssh shane@100.87.222.17` | Windows, Tailscale |
+| Mexico (formerly jaxton) | no SSH configured | Re-enrolled as `mexico` 2026-05-07 |
+- Ollama fully removed from ALL nodes — no longer a cluster function
 - N8N runs on **neworleans** (Docker), NOT on Pi — access at `neworleans:5678` via Tailscale
 
 ### Services (30+ systemd + 7 Docker)
-**Systemd (core):** ollama, ollama-proxy, shanebrain-discord, shanebrain-social, shanebrain-arcade, angel-cloud-gateway, voice-dump, srm-dispatch, mega-dashboard, pico-listener, shanebrain-alerter, pulsar-ai, pulsar-sentinel, shanebrain-ready, drive-agent, workflow-agent, media-blitz-gallery, mini-shanebrain, claudemd-sync, shanebrain-agents, buddy-claude, thought-tree, halofinance-ledger, rojo-angel-cloud, influxdb, redis-server
+**Systemd (core):** shanebrain-discord, shanebrain-social, shanebrain-arcade, angel-cloud-gateway, voice-dump, srm-dispatch, mega-dashboard, pico-listener, shanebrain-alerter, pulsar-ai, pulsar-sentinel, shanebrain-ready, drive-agent, workflow-agent, media-blitz-gallery, mini-shanebrain, claudemd-sync, shanebrain-agents, buddy-claude, thought-tree, halofinance-ledger, rojo-angel-cloud, influxdb, redis-server
 **Brain Farm (systemd, 10 services):** weather-brain, market-sentinel-brain, book-progress-brain, cluster-brain, knowledge-harvester-brain, letter-brain, mood-tracker-brain, social-reporter-brain, system-watchdog-brain, weight-coach-brain — all run from `mega-dashboard/brains/`, each polling data and writing JSON files read by dashboard `/api/*` routes
 **Docker (Pi):** shanebrain-mcp (host networking — Tailscale-accessible), t2v-transformers (port 8090), open-webui, portainer, 17 mega-crew bots
 **Docker (neworleans):** shanebrain-weaviate, shanebrain-n8n, n8n-postgres, n8n-redis
@@ -501,15 +501,17 @@ Dashboard API: GET /api/mega-brain (server.py at shanebrain-core/mega-dashboard/
 4. **Inter-bot knowledge sharing** — bots query each other's memories, not just their own
 5. **Autonomous goal-setting** — bots set their own improvement targets based on performance data
 
-MEGA model: bot LLM inference DISABLED — Ollama fully removed 2026-04-30 (bot ask_bot() calls will fail until replacement chosen)
+MEGA model: bot LLM inference DISABLED — Ollama fully deleted 2026-05-07 (binary + all files gone, bot ask_bot() calls will fail until replacement chosen)
 8TB at /media/shane/ANGEL_CLOUD/ is backup only — nightly rsync at 2am
 
 ## MEGA Crew Performance Overhaul (April 9, 2026)
 
-### Bot LLM Routing (DISABLED — 2026-04-30)
-- Ollama fully removed. Bot ask_bot() calls using llama3.2:1b via localhost:11434 will fail.
-- Cluster proxy (port 11435) also stopped and disabled.
-- Replacement LLM for bots not yet chosen — options: Claude API, hosted endpoint, or re-enable local Ollama.
+### Bot LLM Routing (DISABLED — Ollama fully deleted 2026-05-07)
+- Ollama binary, libs, systemd units, system user, and RAID directory all deleted.
+- Bot ask_bot() calls (llama3.2:1b via localhost:11434) will fail — no local inference available.
+- Cluster proxy (port 11435) also fully deleted.
+- MCP tools (shanebrain_chat, shanebrain_draft_create, shanebrain_ollama_generate) now use Claude Haiku.
+- Bot-level LLM replacement not yet chosen — options: Claude API per-bot or leave disabled.
 
 ### P0 Fixes Applied
 - **Flux**: removed subprocess.Popen process spawning — now sends bus alert to Crank instead (was causing duplicate bot processes)
@@ -580,10 +582,10 @@ shanebrain_reply_email(to="someone@email.com", subject="Re: Test", body="Got it!
 - System Health panel: clickable, opens Glances at `http://100.67.120.6:61208`
 - AI Build Status: rewritten to show live systemd services + Docker containers
 - CSS cache-busting: `style.css?v=20260410g` + no-cache response headers in server.py
-- ShaneBrain AI chat: **Claude Haiku (claude-haiku-4-5-20251001) via ANTHROPIC_API_KEY** — Ollama fully removed 2026-05-07
+- ShaneBrain AI chat: **Claude Haiku (claude-haiku-4-5-20251001) via ANTHROPIC_API_KEY** — Ollama fully deleted 2026-05-07
 - Dashboard backend: `/mnt/shanebrain-raid/shanebrain-core/mega-dashboard/server.py`
 - Dashboard frontend: `/mnt/shanebrain-raid/shanebrain-core/mega-dashboard/` (index.html, style.css, panels/*.js)
-- MEGA chat model: **Claude Haiku via ANTHROPIC_API_KEY** (was llama3.2:3b via cluster proxy — Ollama fully removed 2026-05-07)
+- MEGA chat model: **Claude Haiku via ANTHROPIC_API_KEY** (was llama3.2:3b via cluster proxy — Ollama fully deleted 2026-05-07)
 
 ## Google Calendar Integration (April 10, 2026)
 - OAuth client: "ShaneBrain Dashboard" under project logibot-active-project
