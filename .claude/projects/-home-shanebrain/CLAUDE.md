@@ -1,7 +1,7 @@
 # CLAUDE.md — ShaneBrain Global Instructions v4.1
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Ollama FULLY DELETED (binary, libs, all systemd units, system user, RAID dir, dead code stripped from MCP server) — all inference now Claude Haiku. MCP tools shanebrain_chat + shanebrain_draft_create + shanebrain_ollama_generate rewired and working. ollama-proxy was still silently running — killed. Preflight 17/0/0, 12.6GB RAM free.
+> Updated: 2026-05-07 | Last session: Ollama FULLY DELETED + all references purged from MCP server, dashboard backend, and all frontend panels (health dots, mindmap, 3D viz, shared config). Inference dot now shows CLAUDE (green). MCP lifespan NameError fixed. ollama-proxy.py deleted. 3 commits pushed.
 
 ---
 
