@@ -1,7 +1,7 @@
 # CLAUDE.md — ShaneBrain Global Instructions v4.1
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Brain farm Ollama purge complete — weight-coach + letter brains rewired to Claude Haiku (were silently failing since Apr 30), cluster-brain rewritten from 4-node Ollama HTTP to 7-node Tailscale TCP pings, watchdog ollama entry removed, 4 dead scripts deleted, unit file After=ollama.service deps cleaned up.
+> Updated: 2026-05-07 | Last session: Ollama fully purged from entire stack — brains rewired, alerter cleaned, 9 dead scripts deleted, dashboard + MCP + frontend all updated. Nothing running touches Ollama anywhere.
 
 ---
 
