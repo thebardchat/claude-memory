@@ -1,7 +1,7 @@
 # CLAUDE.md — ShaneBrain Global Instructions v4.2
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Agents ecosystem purge pass 2 — dispatcher keyword map, librarian embed instructions, ops service list + health check, shanebrain-agents.service dependency all cleaned. Nothing in agents touches Ollama anywhere.
+> Updated: 2026-05-07 | Last session: Final Ollama sweep — letter/weight-coach brain service deps, MCP docstring, update_claude_md_counts string, cluster-nodes.json deleted, 10 .bak brain files deleted. Stack is clean.
 
 ---
 
