@@ -1,7 +1,7 @@
 @echo off
-title SHANEBRAIN — Neural Interface
+setlocal EnableExtensions
+title SHANEBRAIN - Neural Interface
 color 0B
-mode con: cols=80 lines=45
 
 :start
 cls
@@ -14,7 +14,7 @@ echo       \__ \ __ ^|/ _ \^| .` ^| _^||  _ \   / / _ \ ^| ^|^| .` ^|
 echo       ^|___/_^|^|_/_/ \_\_^|\_^|___^|___/_^|_^|/_/ \_\___|_^|\_^|
 echo.
 echo       Faith . Family . Sobriety . Local AI for the 800M
-echo                 Built by Shane Brazelton + Claude AI
+echo                Built by Shane Brazelton + Claude AI
 echo.
 echo   ========================================================================
 echo.
@@ -38,11 +38,13 @@ echo.
 ssh -t shanebrain@shanebrain "bash -i -c 'bash /mnt/shanebrain-raid/shanebrain-core/scripts/preflight.sh && claude'"
 echo.
 if %ERRORLEVEL% NEQ 0 (
-    echo   ERROR: SSH failed. Check that Tailscale is running and Pi is online.
-    echo.
-    echo   Press any key to return to menu...
-    pause >nul
+    echo   ERROR: SSH failed. Check Tailscale is running and Pi is online.
+) else (
+    echo   Claude session ended.
 )
+echo.
+echo   Press any key to return to menu...
+pause >nul
 goto :start
 
 :commandcenter
@@ -55,6 +57,7 @@ goto :start
 
 :exit
 echo.
-echo   ShaneBrain -- signing off. Faith. Family. Sobriety.
+echo   ShaneBrain - signing off. Faith. Family. Sobriety.
 echo.
 timeout /t 2 /nobreak >nul
+exit /b 0
