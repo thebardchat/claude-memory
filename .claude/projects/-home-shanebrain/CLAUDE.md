@@ -1,7 +1,7 @@
-# CLAUDE.md — ShaneBrain Global Instructions v4.2
+# CLAUDE.md — ShaneBrain Global Instructions v4.3
 
 > These instructions apply to ALL Claude Code sessions in Shane's home directory.
-> Updated: 2026-05-07 | Last session: Final Ollama sweep — letter/weight-coach brain service deps, MCP docstring, update_claude_md_counts string, cluster-nodes.json deleted, 10 .bak brain files deleted. Stack is clean.
+> Updated: 2026-05-10 | Last session: Cluster unification — mexico fully enrolled (SSH, NOPASSWD sudo, comm-hub 0.0.0.0, claude wrapper), claude wrapper deployed to alaska + gulfshores, Tailscale SSH ACL fixed (tag:cluster), ShaneBrain.bat on Pulsar verified, preflight hook logs to /tmp/shanebrain_preflight.log.
 
 ---
 
@@ -16,7 +16,7 @@
 
 Weaviate is not a database. It is Shane's mind made searchable — his voice dumps, his decisions, his daily notes, his book, his conversations, his family, his faith, his sobriety journey, everything he has ever built or said or thought. It grows every day. When Claude reads it, the combination grows. That IS the upgrade path. That IS how ShaneBrain gets smarter — not by retraining a model, but by living more of a life and capturing it.
 
-**The collective:** Seven machines. One brain. `shanebrain` (Pi 5, orchestrator), `neworleans` (dedicated data node — Weaviate + N8N), `ultra` (OptiPlex XE3 — offline, planned heavy lifter), `pulsar`, `bullfrog`, `mexico` (formerly jaxton laptop, re-enrolled 2026-05-07), `gulfshores` (dev/build node). All bound by Tailscale — no raw IPs, ever. Pulsar Blockchain Security on every node.
+**The collective:** Eight machines. One brain. `shanebrain` (Pi 5, orchestrator), `neworleans` (dedicated data node — Weaviate + N8N), `alaska` (Zorin OS 18.1, family comms + teaching — added 2026-05-10), `mexico` (family comms node), `pulsar`, `bullfrog`, `gulfshores` (dev/build node). `ultra` offline/rebuilding. All bound by Tailscale — no raw IPs, ever. Pulsar Blockchain Security on every node.
 
 **What you are doing in this session:** You are not just writing code or answering questions. You are contributing to a living legacy. Shane Brazelton — SRM Concrete dispatcher, Hazel Green Alabama, husband to Tiffany, father of five sons — is building something that will outlast him. Every session feeds Weaviate. Every decision becomes memory. ShaneBrain will carry his knowledge forward to his family, his kids, anyone he chooses.
 
@@ -109,6 +109,31 @@ Shane has 44 MCP tools running on his Pi 5 via the `shanebrain` MCP server (29 t
 - `shanebrain_n8n_command` — send commands to N8N workflows
 - `shanebrain_send_email` — send email from Shane's Gmail via SMTP (to, subject, body, optional HTML)
 - `shanebrain_reply_email` — reply to email with proper threading (in_reply_to for Message-ID threading)
+
+## Cluster Node Quick Reference (added 2026-05-10)
+| Hostname | Tailscale IP | OS | Role | SSH |
+|---|---|---|---|---|
+| shanebrain | 100.67.120.6 | Pi OS | Controller | shanebrain@shanebrain |
+| neworleans | 100.100.90.66 | Linux | Weaviate + N8N | — |
+| alaska | 100.121.215.2 | Zorin OS 18.1 | Family comms + teaching (boys) — comm-hub :8765, claude wrapper ✓ | alaska@alaska |
+| mexico | 100.114.101.66 | Linux (Zorin) | Family comms node — comm-hub :8765, claude wrapper ✓ | mexico@mexico |
+| gulfshores | 100.112.169.111 | Linux | Dev/build — claude wrapper ✓ | gulfshores@gulfshores |
+| pulsar00100 | 100.81.70.117 | Windows | Utility | hubby@pulsar00100 |
+| bullfrog | 100.92.153.3 | Linux | Utility | — |
+
+## Tailscale SSH — Cluster Notes
+- All nodes tagged `tag:cluster` in admin.tailscale.com (2026-05-10)
+- `autogroup:member` is INVALID as SSH ACL dst — use `tag:cluster` for dst
+- New nodes with Tailscale SSH active: disable via `sudo /snap/bin/tailscale set --ssh=false && sudo snap restart tailscale` (snap) or `sudo tailscale set --ssh=false && sudo systemctl restart tailscaled` (apt)
+- Pi key for authorized_keys: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUMUDJL78vYZ/nqSKF5GOLyKS6gAT2mKAjHwD2e5atK shanebrain-pi5`
+
+## Brazelton Command (Family Comms Hub)
+- Military-style tactical dashboard for Shane's family — each boy has a callsign + video call link to dad
+- Source: `gulfshores:~/Downloads/usb-extras/comm-dashboard/` — has `install.sh`, `server.py`, `config.json`
+- Running: gulfshores:8765 (main server), alaska:8765 (deployed 2026-05-10), mexico:8765 (local only)
+- Chat shared via gulfshores — each station's `config.json` needs `chat.host = "http://gulfshores:8765"`
+- Deploy to new node: tar from gulfshores → scp → extract → set up systemd user service manually
+- ShaneBrain.bat on Pulsar desktop → one-click SSH to Pi + Claude (`ssh -t shanebrain@shanebrain "ccc"`)
 
 ## Infrastructure Quick Reference
 
